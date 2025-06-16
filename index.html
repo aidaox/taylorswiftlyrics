@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>歌词组件嵌入示例</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.6;
+        padding: 1rem 2rem;
+        background-color: #f4f5f7;
+        color: #172b4d;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+      h1,
+      h2,
+      h3 {
+        color: #091e42;
+      }
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+      h2 {
+        font-size: 1.75rem;
+        border-bottom: 2px solid #dfe1e6;
+        padding-bottom: 0.5rem;
+        margin-top: 2.5rem;
+      }
+      p,
+      li {
+        color: #42526e;
+      }
+      a {
+        color: #0052cc;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code {
+        background-color: #f0f2f5;
+        padding: 0.2em 0.4em;
+        margin: 0;
+        font-size: 85%;
+        border-radius: 6px;
+      }
+      pre {
+        background-color: #f0f2f5;
+        border: 1px solid #dfe1e6;
+        border-radius: 6px;
+        padding: 1rem;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-size: 14px;
+      }
+      .iframe-wrapper {
+        border: 1px solid #dfe1e6;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        margin: 2rem 0;
+      }
+      iframe {
+        width: 100%;
+        border: none;
+        display: block;
+        transition: height 0.3s ease-in-out;
+      }
+      .notice {
+        background-color: #e9f2ff;
+        border-left: 4px solid #0052cc;
+        padding: 1rem;
+        margin: 1.5rem 0;
+        border-radius: 4px;
+      }
+      .notice p {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Taylor Swift 歌词组件嵌入示例</h1>
+      <p>
+        欢迎！本页面是歌词嵌入指南，它既是一个可工作的演示，也提供了供其他开箱即用代码嵌入示例。
+      </p>
+
+      <h2>一、工作演示</h2>
+      <p>
+        下方是嵌入式组件的实时演示。本页面已通过脚本自动判断环境，并加载了正确的组件地址（本地测试会指向
+        localhost，线上则指向生产域名）。
+      </p>
+
+      <div class="iframe-wrapper">
+        <iframe
+          id="live-demo-iframe"
+          title="Taylor Swift Lyrics Search - Live Demo"
+          src=""
+        ></iframe>
+      </div>
+
+      <h2>二、如何使用：复制代码</h2>
+      <p>
+        要将这个组件嵌入到您自己的网站，只需复制下方的代码片段即可。<strong>无需任何修改</strong>，它已经配置为使用最终的生产地址。
+      </p>
+      <pre><code>&lt;!-- 1. 这是容纳歌词组件的 iframe --&gt;
+&lt;iframe 
+    id="swift-lyrics-embed"
+    src="https://taylorswiftlyrics.org/embed/search"
+    title="Taylor Swift Lyrics Search"
+    style="width: 100%; border: none; overflow: hidden; display: block;"
+&gt;&lt;/iframe&gt;
+
+&lt;!-- 2. 这是让 iframe 高度自动适应的关键脚本 --&gt;
+&lt;script&gt;
+    window.addEventListener('message', (event) => {
+        // 安全性检查：确保消息来自 taylorswiftlyrics.org
+        if (event.origin !== 'https://taylorswiftlyrics.org') {
+            return;
+        }
+
+        if (event.data &amp;&amp; event.data.type === 'iframeResize') {
+            const iframe = document.getElementById('swift-lyrics-embed');
+            if (iframe &amp;&amp; typeof event.data.payload.height === 'number') {
+                const newHeight = event.data.payload.height + 16; // 16px 缓冲
+                iframe.style.height = `${newHeight}px`;
+            }
+        }
+    });
+&lt;/script&gt;</code></pre>
+
+      <div class="notice">
+        <p>
+          <strong>提示：</strong>您也可以直接嵌入某一首歌，只需修改
+          <code>iframe</code> 的 <code>src</code> 属性即可，例如：<code
+            >src="https://taylorswiftlyrics.org/embed/song/fortnight"</code
+          >
+        </p>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        // --- 配置区 ---
+        const localDevUrl = "http://localhost:3000";
+        const productionUrl = "https://taylorswiftlyrics.org";
+        const iframeId = "live-demo-iframe";
+        // ---
+
+        // 判断当前环境
+        const isLocal =
+          window.location.protocol === "file:" ||
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1";
+        const baseUrl = isLocal ? localDevUrl : productionUrl;
+
+        // 设置演示 iframe 的源
+        const iframe = document.getElementById(iframeId);
+        if (iframe) {
+          iframe.src = `${baseUrl}/embed/search`;
+        }
+
+        // 设置消息监听器
+        window.addEventListener("message", (event) => {
+          // 安全性检查，只接受来自正确源的消息
+          if (event.origin !== baseUrl) {
+            return;
+          }
+
+          if (event.data && event.data.type === "iframeResize") {
+            const demoIframe = document.getElementById(iframeId);
+            if (demoIframe && typeof event.data.payload.height === "number") {
+              const newHeight = event.data.payload.height + 16;
+              demoIframe.style.height = `${newHeight}px`;
+              console.log(`[Demo] Iframe height updated to: ${newHeight}px`);
+            }
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
